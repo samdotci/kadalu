@@ -8,6 +8,7 @@ on:
 
 env:
   kadalu_version: $(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+  builder_repo: ${{ vars.builder_repo || 'kadalu/builder' }}
 
 
 jobs:
@@ -124,8 +125,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            docker.io/${{ secrets.DOCKER_USER }}/kadalu-builder:${{ steps.vars.outputs.tag }}
-            docker.io/${{ secrets.DOCKER_USER }}/kadalu-builder:latest
+            docker.io/${{ env.builder_repo }}:${{ steps.vars.outputs.tag }}
+            docker.io/${{ env.builder_repo }}:latest
           build-args: |
             version=${{ steps.vars.outputs.tag }}
             builddate=`date +%Y-%m-%d-%H:%M`
@@ -147,6 +148,7 @@ jobs:
             docker.io/${{ secrets.DOCKER_USER }}/kadalu-csi:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
+            builder_repo=${{ env.builder_repo }}
             version=${{ steps.vars.outputs.tag }}
             builddate=`date +%Y-%m-%d-%H:%M`
           secrets: |
@@ -167,6 +169,7 @@ jobs:
             docker.io/${{ secrets.DOCKER_USER }}/kadalu-server:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
+            builder_repo=${{ env.builder_repo }}
             version=${{ steps.vars.outputs.tag }}
             builddate=`date +%Y-%m-%d-%H:%M`
           secrets: |
@@ -187,6 +190,7 @@ jobs:
             docker.io/${{ secrets.DOCKER_USER }}/kadalu-operator:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
+            builder_repo=${{ env.builder_repo }}
             version=${{ steps.vars.outputs.tag }}
             builddate=`date +%Y-%m-%d-%H:%M`
           secrets: |
