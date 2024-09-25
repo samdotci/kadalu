@@ -439,6 +439,7 @@ def deploy_server_pods(obj):
     voltype = obj["spec"]["type"]
     pv_reclaim_policy = obj["spec"].get("pvReclaimPolicy", "delete")
     tolerations = obj["spec"].get("tolerations")
+    node_selector = obj["spec"].get("nodeSelector")
     docker_user = os.environ.get("DOCKER_USER", "kadalu")
 
     shd_required = False
@@ -477,6 +478,7 @@ def deploy_server_pods(obj):
         template_args["k8s_dist"] = K8S_DIST
         template_args["verbose"] = VERBOSE
         template_args["tolerations"] = tolerations
+        template_args["node_selector"] = node_selector
 
         filename = os.path.join(MANIFESTS_DIR, "server.yaml")
         template(filename, **template_args)
@@ -486,6 +488,7 @@ def deploy_server_pods(obj):
                           manifest=filename,
                           node=storage.get("node", "")))
     add_tolerations("daemonset", NODE_PLUGIN, tolerations)
+    add_node_selector("daemonset", NODE_PLUGIN, node_selector)
 
 
 def handle_external_storage_addition(core_v1_client, obj):
@@ -494,6 +497,7 @@ def handle_external_storage_addition(core_v1_client, obj):
     details = obj["spec"]["details"]
     pv_reclaim_policy = obj["spec"].get("pvReclaimPolicy", "delete")
     tolerations = obj["spec"].get("tolerations")
+    node_selector = obj["spec"].get("nodeSelector")
 
     hosts = []
     ghost = details.get("gluster_host", None)
@@ -530,6 +534,7 @@ def handle_external_storage_addition(core_v1_client, obj):
     lib_execute(KUBECTL_CMD, APPLY_CMD, "-f", filename)
     logging.info(logf("Deployed External StorageClass", volname=volname, manifest=filename))
     add_tolerations("daemonset", NODE_PLUGIN, tolerations)
+    add_node_selector("daemonset", NODE_PLUGIN, node_selector)
 
 
 def handle_added(core_v1_client, obj):
@@ -1049,6 +1054,21 @@ def add_tolerations(resource, name, tolerations):
         logging.error(logf(errmsg, error=err))
     logging.info(logf("Added tolerations", resource=resource, name=name,
         tolerations=str(tolerations)))
+    return
+
+def add_node_selector(resource, name, node_selector):
+    """Adds node selector to kubernetes resource/name object"""
+    if node_selector is None:
+        return
+    patch = {"spec": {"template": {"spec": {"nodeSelector": node_selector}}}}
+    try:
+        lib_execute(KUBECTL_CMD, PATCH_CMD, resource, name, "-p", json.dumps(patch), "--type=merge")
+    except CommandException as err:
+        errmsg = f"Unable to patch {resource}/{name} with node selector \
+        {str(node_selector)}"
+        logging.error(logf(errmsg, error=err))
+    logging.info(logf("Added node selector", resource=resource, name=name,
+        node_selector=str(node_selector)))
     return
 
 def main():
