@@ -124,8 +124,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            docker.io/kadalu/builder:${{ steps.vars.outputs.tag }}
-            docker.io/kadalu/builder:latest
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-builder:${{ steps.vars.outputs.tag }}
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-builder:latest
           build-args: |
             version=${{ steps.vars.outputs.tag }}
             builddate=`date +%Y-%m-%d-%H:%M`
@@ -143,8 +143,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            docker.io/kadalu/kadalu-csi:${{ steps.vars.outputs.tag }}
-            docker.io/kadalu/kadalu-csi:latest
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-csi:${{ steps.vars.outputs.tag }}
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-csi:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
             version=${{ steps.vars.outputs.tag }}
@@ -163,8 +163,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            docker.io/kadalu/kadalu-server:${{ steps.vars.outputs.tag }}
-            docker.io/kadalu/kadalu-server:latest
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-server:${{ steps.vars.outputs.tag }}
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-server:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
             version=${{ steps.vars.outputs.tag }}
@@ -183,8 +183,8 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            docker.io/kadalu/kadalu-operator:${{ steps.vars.outputs.tag }}
-            docker.io/kadalu/kadalu-operator:latest
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-operator:${{ steps.vars.outputs.tag }}
+            docker.io/${{ secrets.DOCKER_USER }}/kadalu-operator:latest
           build-args: |
             builder_version=${{ steps.vars.outputs.tag }}
             version=${{ steps.vars.outputs.tag }}
